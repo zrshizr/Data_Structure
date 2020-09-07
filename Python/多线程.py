@@ -1,36 +1,51 @@
-#!/usr/bin/python3
+# import threading
+# import time
+# from threading import current_thread 
+# def thread_job():
+#     print('T1_stra\n')
+#     for i in range(10):
+#         print(i)
+#         time.sleep(0.1)
+#     print('T1 finisha\n')
+# def T2_job():
+#     print('T2_staret\n')
+#     print('T2 finish\n')
+# def main():
+#     add_thread = threading.Thread(target=thread_job,name='T1')
+#     T2_add = threading.Thread(target=T2_job,name='T2')
+#     add_thread.start()#开始运算
+#     T2_add.start()
+#     add_thread.join()
+#     print('all done\n')
+#     # print((threading.active_count()))
+#     # print(threading.enumerate())
+#     # print(threading.current_thread())
 
+# if __name__ == '__main__':
+#     main()
 import threading
 import time
+from queue import Queue
 
-exitFlag = 0
+def job(l,q):
+    for i in range(len(l)):
+        l[i] = l[i]**2
+    q.put(l) 
+def multithreading(data):#data =[[1,2,3],[4,5,6],[4,4,4],[5,5,5]]
+    q = Queue() #放入计算出来返回值
+    threads = [] # 线程放这里面 
+    for i in range(4):#object
+        t = threading.Thread(target=job,args=(data[i],q)) #传入data和q
+        t.start()
+        threads.append(t)
+    for thread in threads:
+        thread.join()
+    result =[]
+    for _ in range(4):
+        result.append(q.get())
+    print(result)
 
-class myThread (threading.Thread):
-    def __init__(self, threadID, name, counter):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.counter = counter
-    def run(self):
-        print ("开始线程：" + self.name)
-        print_time(self.name, self.counter, 5)
-        print ("退出线程：" + self.name)
-
-def print_time(threadName, delay, counter):
-    while counter:
-        if exitFlag:
-            threadName.exit()
-        time.sleep(delay)
-        print ("%s: %s" % (threadName, time.ctime(time.time())))
-        counter -= 1
-
-# 创建新线程
-thread1 = myThread(1, "Thread-1", 1)
-thread2 = myThread(2, "Thread-2", 2)
-
-# 开启新线程
-thread1.start()
-thread2.start()
-thread1.join()
-thread2.join()
-print ("退出主线程")
+if __name__ == '__main__':
+    l =[[1,2,3],[4,5,6],[4,4,4],[5,5,5]]
+    multithreading(l)
+  
